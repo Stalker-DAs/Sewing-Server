@@ -27,3 +27,10 @@ Socket模块的主要作用是封装socket类，以提供所有socket API功能�
 ### TcpServer模块
 tcpserver模块主要是对socket类进行封装，提供一些简单的API可以快速绑定一个或多个地址、启动服务、监听端口、关闭服务、处理socket连接等功能。
 ### Http模块
+Http模块部分通过使用上面提到的服务器基础模块，搭建了一个支持高并发的Http服务器。该模块中HttpRequest和HttpResponse用于将Http请求和响应的内容进行封装统一管理，类的内部对不同参数设置了相应的set和get请求，方便开发人员获取或设置参数。HttpRequestParser和HttpResponseParser用于解析http命令，并将其保存到前面提到的HttpRequest和HttpResponse。HttpSession和HttpConnection继承了socketStream，分别定义了服务端和客户端接收数据和发送数据的操作。Servlet是用于定义针对不同uri的http请求，服务器需要做出的不同响应，例如doGet、doPost等。HttpServer则是基于TcpServer来实现的，主要实现当一个连接到来之后需要进行的操作。
+
+## 运行环境
+运行系统：Ubuntu 20.04
+
+## 其他
+版权说明：该项目用于自我学习，不会用于商业用途。项目学习自sylar大佬的C++高性能服务器框架：https://github.com/sylar-yin/sylar。
