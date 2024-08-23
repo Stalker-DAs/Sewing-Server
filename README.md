@@ -33,4 +33,5 @@ Http模块部分通过使用上面提到的服务器基础模块，搭建了一�
 运行系统：Ubuntu 20.04
 
 ## 其他
-版权说明：该项目用于自我学习，不会用于商业用途。项目学习自sylar大佬的C++高性能服务器框架：https://github.com/sylar-yin/sylar。
+版权说明：该项目用于自我学习，不会用于商业用途。
+项目学习自sylar大佬的C++高性能服务器框架，自己进行了部分改进：https://github.com/sylar-yin/sylar
