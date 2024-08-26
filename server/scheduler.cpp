@@ -9,6 +9,8 @@ static server::Logger::ptr g_logger = LOG_GET_LOGGER("system");
 static thread_local Scheduler *t_scheduler = nullptr;
 // 主fiber，也就是执行调度的fiber
 static thread_local Fiber *t_fiber = nullptr;
+// 线程连续执行任务池中的任务最大次数
+static uint8_t frequency = 10;
 
 Scheduler::Scheduler(size_t threads, bool use_caller, const std::string &name) : m_name(name), m_use_caller(use_caller)
 {
@@ -113,6 +115,8 @@ void Scheduler::MainFunc(){
     Fiber::ptr tmp;
     FiberAndCb ret;
 
+    uint8_t work_times = 0;
+
     while (true){
         ret.reset();
         bool tickle_threads = false;
@@ -121,6 +125,9 @@ void Scheduler::MainFunc(){
             MutexType::Lock lock(m_mutex);
             for (auto it = fiberQueue.begin(); it != fiberQueue.end(); ++it)
             {
+                if (work_times == frequency){
+                    break;
+                }
                 if (it->m_thread != -1 && it->m_thread!=GetThreadId()){
                     tickle_threads = true;
                     continue;
@@ -144,7 +151,8 @@ void Scheduler::MainFunc(){
             tickle();
         }
 
-        if (ret.m_fiber && (ret.m_fiber->getState() != Fiber::TERM && ret.m_fiber->getState() != Fiber::EXCEPT)){
+        if (ret.m_fiber && (ret.m_fiber->getState() != Fiber::TERM && ret.m_fiber->getState() != Fiber::EXCEPT) && work_times != frequency){
+            ++work_times;
             ret.m_fiber->swapIn();
             // ret.m_fiber->swapIn();
             --activate_threads;
@@ -157,7 +165,8 @@ void Scheduler::MainFunc(){
             }
             ret.reset();
         }
-        else if (ret.m_cb){
+        else if (ret.m_cb && work_times != frequency){
+            ++work_times;
             //Fix
             if (tmp){
                 tmp->reset(ret.m_cb);
@@ -185,6 +194,8 @@ void Scheduler::MainFunc(){
             }
         }
         else{
+            work_times = 0;
+
             if (is_active){
                 --activate_threads;
             }
